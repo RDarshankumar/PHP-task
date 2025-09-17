@@ -1,8 +1,11 @@
 <?php
+
 session_start();
 require_once "../config/db_connection.php";
 
+
 $instructor_id = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 1;
+
 
 function flash_redirect($url, $msg = null) {
     if ($msg) {
@@ -13,11 +16,15 @@ function flash_redirect($url, $msg = null) {
     exit;
 }
 
+
 $base_url = $_SERVER['PHP_SELF'];
+
 
 function post($key) {
     return isset($_POST[$key]) ? trim($_POST[$key]) : null;
 }
+
+
 
 
 if (isset($_GET['delete_id'])) {
@@ -31,28 +38,30 @@ if (isset($_GET['delete_id'])) {
     }
 }
 
+
 if (isset($_POST["add_course"])) {
     $title = post('title');
     $description = post('description');
     $price_raw = post('price');
 
+    
     $errors = [];
     if ($title === '' || $title === null) $errors[] = "Title is required.";
     if ($description === '' || $description === null) $errors[] = "Description is required.";
     if ($price_raw === '' || $price_raw === null) {
         $price = 0.00;
     } else {
-        
+      
         if (!is_numeric($price_raw)) $errors[] = "Price must be a number.";
         $price = (float) $price_raw;
     }
 
     if (!empty($errors)) {
-      
+        
         flash_redirect($base_url, implode(' ', $errors));
     }
 
-   .
+    
     $insert_sql = "INSERT INTO courses (title, description, instructor_id, price, status) VALUES (?, ?, ?, ?, 'pending')";
     $stmt = $conn->prepare($insert_sql);
     if ($stmt) {
@@ -110,6 +119,7 @@ if (isset($_POST['edit_course'])) {
     }
 }
 
+
 if (isset($_POST["add_lesson"])) {
     $course_id = (int) post('course_id');
     $lesson_title = post('lesson_title');
@@ -130,6 +140,7 @@ if (isset($_POST["add_lesson"])) {
     }
 }
 
+
 if (isset($_POST["add_quiz"])) {
     $course_id = (int) post('quiz_course_id');
     $quiz_title = post('quiz_title');
@@ -148,6 +159,7 @@ if (isset($_POST["add_quiz"])) {
     }
 }
 
+
 if (isset($_GET['delete_quiz_id'])) {
     $quiz_id = (int) $_GET['delete_quiz_id'];
     $stmt = $conn->prepare("
@@ -164,6 +176,7 @@ if (isset($_GET['delete_quiz_id'])) {
     }
 }
 
+
 if (isset($_POST["add_question"])) {
     $quiz_id = (int) post('quiz_id');
     $question_text = post('question_text');
@@ -174,7 +187,7 @@ if (isset($_POST["add_question"])) {
         flash_redirect($base_url, "Please fill all question fields.");
     }
 
-    $options_json = json_encode(array_values($options)); // ensure numeric keys
+    $options_json = json_encode(array_values($options)); 
     $stmt = $conn->prepare("INSERT INTO questions (quiz_id, question_text, options, correct_answer) VALUES (?, ?, ?, ?)");
     if (!$stmt) flash_redirect($base_url, "Error preparing question insert: " . $conn->error);
     $stmt->bind_param("isss", $quiz_id, $question_text, $options_json, $correct_answer);
@@ -192,11 +205,13 @@ $stmt->execute();
 $courses_result = $stmt->get_result();
 $courses = $courses_result->fetch_all(MYSQLI_ASSOC);
 
+
 $stmt = $conn->prepare("SELECT id, title FROM courses WHERE instructor_id = ?");
 $stmt->bind_param("i", $instructor_id);
 $stmt->execute();
 $pub_res = $stmt->get_result();
 $published_courses = $pub_res->fetch_all(MYSQLI_ASSOC);
+
 
 $stmt = $conn->prepare("SELECT q.*, c.title as course_title FROM quizzes q JOIN courses c ON q.course_id = c.id WHERE c.instructor_id = ?");
 $stmt->bind_param("i", $instructor_id);
@@ -217,6 +232,7 @@ if (isset($_GET['edit_id'])) {
     }
 }
 
+
 $msg = isset($_GET['msg']) ? htmlspecialchars($_GET['msg']) : '';
 ?>
 <!DOCTYPE html>
@@ -236,16 +252,19 @@ $msg = isset($_GET['msg']) ? htmlspecialchars($_GET['msg']) : '';
 
 <div class="max-w-5xl mx-auto mt-10 space-y-10">
 
+
   <?php if ($msg): ?>
     <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-3 rounded">
       <?= $msg ?>
     </div>
   <?php endif; ?>
 
+  
   <div class="text-center">
     <h2 class="text-3xl font-semibold text-gray-700">Welcome, Instructor</h2>
   </div>
 
+  
   <div class="bg-white shadow p-6 rounded-lg">
     <h1 class="text-2xl font-bold mb-4">➕ Add New Course</h1>
     <form method="POST" novalidate>
@@ -255,6 +274,7 @@ $msg = isset($_GET['msg']) ? htmlspecialchars($_GET['msg']) : '';
       <button type="submit" name="add_course" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save</button>
     </form>
   </div>
+
 
   <div class="bg-white shadow p-6 rounded-lg">
     <h1 class="text-2xl font-bold mb-4">📚 Manage My Courses</h1>
@@ -279,6 +299,7 @@ $msg = isset($_GET['msg']) ? htmlspecialchars($_GET['msg']) : '';
     </table>
   </div>
 
+ 
   <div class="bg-white shadow p-6 rounded-lg">
     <h1 class="text-2xl font-bold mb-4">📖 Add Lesson</h1>
     <form method="POST" novalidate>
@@ -295,6 +316,7 @@ $msg = isset($_GET['msg']) ? htmlspecialchars($_GET['msg']) : '';
     </form>
   </div>
 
+  
   <div class="bg-white shadow p-6 rounded-lg">
     <h1 class="text-2xl font-bold mb-4">📝 Add Quiz</h1>
     <form method="POST" novalidate>
@@ -309,6 +331,7 @@ $msg = isset($_GET['msg']) ? htmlspecialchars($_GET['msg']) : '';
     </form>
   </div>
 
+  
   <div class="bg-white shadow p-6 rounded-lg">
     <h1 class="text-2xl font-bold mb-4">📊 My Quizzes</h1>
     <table class="w-full border text-center">
@@ -330,6 +353,7 @@ $msg = isset($_GET['msg']) ? htmlspecialchars($_GET['msg']) : '';
     </table>
   </div>
 
+  
   <?php if ($edit_course): ?>
    <div class="bg-white shadow p-6 rounded-lg">
     <h1 class="text-2xl font-bold mb-4">✏️ Edit Course</h1>
