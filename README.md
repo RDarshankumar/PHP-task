@@ -137,7 +137,7 @@ See [`config/database_schema.sql`](config/database_schema.sql) for full details.
 ---
 
 ## 📝 Notes
-
+- admin id = admin@email.com password= 123
 - No email verification or password reset is implemented
 - No file uploads (e.g., for lesson materials)
 - No certificate download logic, but certificates table exists for future use
@@ -149,5 +149,6 @@ See [`config/database_schema.sql`](config/database_schema.sql) for full details.
 For any issues, please contact the project maintainer.
 
 ---
+
 
 **Enjoy learning and teaching!**
