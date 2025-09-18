@@ -94,7 +94,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body class="flex items-center justify-center min-h-screen bg-gray-100">
 
   <div class="w-full max-w-sm bg-white rounded-2xl shadow-lg p-6">
-    <h1 class="text-2xl font-bold text-center text-gray-700 mb-6">Login</h1>
+    <h1 class="text-2xl font-bold text-center text-gray-700 mb-6">LMS Login </h1>
+   
     
     <form method="POST" action="index.php" class="space-y-4">
       <div>
